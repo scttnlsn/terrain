@@ -6,6 +6,7 @@ Gem::Specification.new do |gem|
   gem.version       = '0.0.0'
   gem.summary       = 'Terrain'
   gem.description   = ''
+  gem.license       = 'MIT'
   gem.authors       = ['Scott Nelson']
   gem.email         = 'scott@scottnelson.co'
 
@@ -16,5 +17,5 @@ Gem::Specification.new do |gem|
 
   gem.add_dependency 'activesupport'
   gem.add_dependency 'pundit', '1.1.0'
-  gem.add_runtime_dependency 'active_model_serializers', '>= 0.10.0.rc5'
+  gem.add_dependency 'active_model_serializers', '>= 0.10.0.rc5'
 end
