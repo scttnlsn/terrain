@@ -21,6 +21,11 @@ module Terrain
         render json: update_record(load_record)
       end
 
+      def destroy
+        destroy_record(load_record)
+        render nothing: true, status: 204
+      end
+
       private
 
       def resource
@@ -42,6 +47,10 @@ module Terrain
       def update_record(record)
         record.update_attributes!(permitted_params)
         record
+      end
+
+      def destroy_record(record)
+        record.delete
       end
     end
   end

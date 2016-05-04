@@ -63,5 +63,35 @@ describe 'Terrain::Resource', type: :controller do
         expect { patch :update, params }.to raise_error ActiveRecord::RecordInvalid
       end
     end
+
+    context 'invalid ID' do
+      let(:params) { ActionController::Parameters.new(id: 999) }
+
+      it 'raises error' do
+        expect { patch :update, params }.to raise_error ActiveRecord::RecordNotFound
+      end
+    end
+  end
+
+  describe '#destroy' do
+    let!(:record) { create(:example) }
+    let(:params) { ActionController::Parameters.new(id: record.id) }
+
+    it 'responds with 204 status' do
+      delete :destroy, params
+      expect(response.status).to eq 204
+    end
+
+    it 'deletes record' do
+      expect { delete :destroy, params }.to change { Example.count }.by -1
+    end
+
+    context 'invalid ID' do
+      let(:params) { ActionController::Parameters.new(id: 999) }
+
+      it 'raises error' do
+        expect { patch :update, params }.to raise_error ActiveRecord::RecordNotFound
+      end
+    end
   end
 end
