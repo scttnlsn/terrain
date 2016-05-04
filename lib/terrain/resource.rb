@@ -17,6 +17,10 @@ module Terrain
         render json: create_record, status: 201
       end
 
+      def show
+        render json: load_record
+      end
+
       def update
         render json: update_record(load_record)
       end

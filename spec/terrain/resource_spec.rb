@@ -33,6 +33,29 @@ describe 'Terrain::Resource', type: :controller do
     end
   end
 
+  describe '#show' do
+    let!(:record) { create(:example) }
+    let(:params) { ActionController::Parameters.new(id: record.id) }
+
+    it 'responds with 200 status' do
+      get :show, params
+      expect(response.status).to eq 200
+    end
+
+    it 'responds with serialized record' do
+      get :show, params
+      expect(response.body).to eq serialize(record).to_json
+    end
+
+    context 'invalid ID' do
+      let(:params) { ActionController::Parameters.new(id: 999) }
+
+      it 'raises error' do
+        expect { get :show, params }.to raise_error ActiveRecord::RecordNotFound
+      end
+    end
+  end
+
   describe '#update' do
     let!(:record) { create(:example) }
     let(:attrs) { attributes_for(:example) }
