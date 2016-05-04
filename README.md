@@ -2,11 +2,6 @@
 
 Opinionated toolkit for building CRUD APIs with Rails
 
-* error handling
-* basic CRUD
-* serialization via
-* authorization via [Pundit](https://github.com/elabs/pundit)
-
 ## Install
 
 Add Terrain to your Gemfile:
@@ -83,6 +78,8 @@ Authorization is handled by [Pundit](https://github.com/elabs/pundit).  If the p
 via [ActiveModelSerializers](https://github.com/rails-api/active_model_serializers)
 
 #### Querying
+
+Params:
 
 * `include` - This corresponds to the `ActiveModelSerializers` include option and embeds the given relationships in the response.  Relationships are also preloaded according to the given string.  If omitted then no relationships will be included or embedded in the response.
 
