@@ -1,12 +1,9 @@
 module Terrain
   module Errors
-    class Unauthenticated < StandardError; end
-
     extend ActiveSupport::Concern
 
     included do
       rescue_from 'ActiveRecord::AssociationNotFoundError', with: :association_not_found
-      rescue_from Unauthenticated, with: :unauthenticated
       rescue_from 'Pundit::NotAuthorizedError', with: :unauthorized
       rescue_from 'ActiveRecord::RecordNotFound', with: :record_not_found
       rescue_from 'ActionController::RoutingError', with: :route_not_found

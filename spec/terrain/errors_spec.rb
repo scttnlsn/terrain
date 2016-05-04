@@ -20,19 +20,6 @@ describe 'Terrain::Errors', type: :controller do
     it { expect_json('error.key', 'association_not_found') }
   end
 
-  context 'unauthenticated' do
-    controller do
-      def index
-        raise Terrain::Errors::Unauthenticated
-      end
-    end
-
-    it { expect(response.status).to eq 401 }
-    it { expect_json_types(error: :object) }
-    it { expect_json_types('error.message', :string) }
-    it { expect_json('error.key', 'unauthenticated') }
-  end
-
   context 'unauthorized' do
     controller do
       def index

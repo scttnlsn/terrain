@@ -88,9 +88,6 @@ module Terrain
         end
       end
 
-      # These methods are indended to be overridden
-      # if additional functionality is needed.
-
       def load_record
         preloaded_resource.find(params[:id])
       end
