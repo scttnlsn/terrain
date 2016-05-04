@@ -1,5 +1,3 @@
-require 'active_support'
-
 module Terrain
   module Errors
     class Unauthenticated < StandardError; end
@@ -8,12 +6,21 @@ module Terrain
     extend ActiveSupport::Concern
 
     included do
-      rescue_from 'ActiveRecord::RecordNotFound', with: :record_not_found
-      rescue_from 'ActionController::RoutingError', with: :route_not_found
       rescue_from Unauthenticated, with: :unauthenticated
       rescue_from Unauthorized, with: :unauthorized
+      rescue_from 'ActiveRecord::RecordNotFound', with: :record_not_found
+      rescue_from 'ActionController::RoutingError', with: :route_not_found
+      rescue_from 'ActiveRecord::RecordInvalid', with: :record_invalid
 
       private
+
+      def unauthenticated
+        error_response(:unauthenticated, 401)
+      end
+
+      def unauthorized
+        error_response(:unauthorized, 403)
+      end
 
       def record_not_found
         error_response(:record_not_found, 404)
@@ -23,12 +30,8 @@ module Terrain
         error_response(:route_not_found, 404)
       end
 
-      def unauthenticated
-        error_response(:unauthenticated, 401)
-      end
-
-      def unauthorized
-        error_response(:unauthorized, 403)
+      def record_invalid
+        error_response(:record_invalid, 422)
       end
 
       def error_response(key = :server_error, status = 500)

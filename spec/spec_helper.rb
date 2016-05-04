@@ -4,13 +4,18 @@ require 'terrain'
 
 require 'rails'
 require 'action_controller/railtie'
+require 'active_model_serializers'
+require 'active_model_serializers/railtie'
 require 'active_record'
 require 'airborne'
+require 'factory_girl'
+require 'faker'
 require 'rspec/rails'
 
 LOGGER = Logger.new('/dev/null')
 
 Rails.logger = LOGGER
+ActiveModelSerializers.logger = LOGGER
 ActiveRecord::Base.logger = LOGGER
 
 DATABASE = {
@@ -33,3 +38,18 @@ module Terrain
 end
 
 Terrain::Application.initialize!
+
+module Helpers
+  def serialize(value, options = {})
+    ActiveModelSerializers::SerializableResource.new(value, options).as_json.symbolize_keys
+  end
+end
+
+RSpec.configure do |config|
+  config.include Helpers
+  config.include FactoryGirl::Syntax::Methods
+
+  config.use_transactional_fixtures = true
+end
+
+Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each { |f| require f }

@@ -7,6 +7,32 @@ describe 'Terrain::Errors', type: :controller do
 
   before { get :index }
 
+  context 'unauthenticated' do
+    controller do
+      def index
+        raise Terrain::Errors::Unauthenticated
+      end
+    end
+
+    it { expect(response.status).to eq 401 }
+    it { expect_json_types(error: :object) }
+    it { expect_json_types('error.message', :string) }
+    it { expect_json('error.key', 'unauthenticated') }
+  end
+
+  context 'unauthorized' do
+    controller do
+      def index
+        raise Terrain::Errors::Unauthorized
+      end
+    end
+
+    it { expect(response.status).to eq 403 }
+    it { expect_json_types(error: :object) }
+    it { expect_json_types('error.message', :string) }
+    it { expect_json('error.key', 'unauthorized') }
+  end
+
   context 'record not found' do
     controller do
       def index
@@ -33,29 +59,16 @@ describe 'Terrain::Errors', type: :controller do
     it { expect_json('error.key', 'route_not_found') }
   end
 
-  context 'unauthenticated' do
+  context 'route not found' do
     controller do
       def index
-        raise Terrain::Errors::Unauthenticated
+        raise ActiveRecord::RecordInvalid, Example.new
       end
     end
 
-    it { expect(response.status).to eq 401 }
+    it { expect(response.status).to eq 422 }
     it { expect_json_types(error: :object) }
     it { expect_json_types('error.message', :string) }
-    it { expect_json('error.key', 'unauthenticated') }
-  end
-
-  context 'unauthorized' do
-    controller do
-      def index
-        raise Terrain::Errors::Unauthorized
-      end
-    end
-
-    it { expect(response.status).to eq 403 }
-    it { expect_json_types(error: :object) }
-    it { expect_json_types('error.message', :string) }
-    it { expect_json('error.key', 'unauthorized') }
+    it { expect_json('error.key', 'record_invalid') }
   end
 end
