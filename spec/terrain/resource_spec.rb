@@ -7,6 +7,20 @@ describe 'Terrain::Resource', type: :controller do
     resource Example, permit: [:foo, :bar, :baz]
   end
 
+  describe '#index' do
+    let!(:examples) { create_list(:example, 10) }
+
+    it 'responds with 200 status' do
+      get :index
+      expect(response.status).to eq 200
+    end
+
+    it 'responds with serialized records' do
+      get :index
+      expect(response.body).to eq serialize(Example.all).to_json
+    end
+  end
+
   describe '#create' do
     let(:params) { ActionController::Parameters.new(attributes_for(:example)) }
 

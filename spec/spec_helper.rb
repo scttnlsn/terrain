@@ -42,7 +42,11 @@ Terrain::Application.initialize!
 module Helpers
   def serialize(value, options = {})
     options[:include] ||= []
-    ActiveModelSerializers::SerializableResource.new(value, options).as_json.symbolize_keys
+    if value.respond_to?(:each)
+      ActiveModel::Serializer::CollectionSerializer.new(value, options).as_json
+    else
+      ActiveModelSerializers::SerializableResource.new(value, options).as_json.symbolize_keys
+    end
   end
 
   def policy_double(methods)

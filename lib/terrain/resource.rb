@@ -1,3 +1,4 @@
+require 'active_model_serializers'
 require 'pundit'
 
 module Terrain
@@ -17,6 +18,10 @@ module Terrain
     end
 
     module Actions
+      def index
+        render json: preloaded_resource.all
+      end
+
       def create
         record = resource.new(permitted_params)
         authorize_record(record)
