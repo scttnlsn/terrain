@@ -65,7 +65,7 @@ module Terrain
       end
 
       def permitted_params
-        params.permit(*self.class.permit)
+        params.permit(self.class.permit)
       end
 
       def pundit_user
