@@ -19,7 +19,7 @@ module Terrain
 
     module Actions
       def index
-        render json: preloaded_resource.all
+        render json: resource_scope
       end
 
       def create
@@ -86,6 +86,10 @@ module Terrain
         if finder.policy
           authorize(record)
         end
+      end
+
+      def resource_scope
+        preloaded_resource.all
       end
 
       def load_record

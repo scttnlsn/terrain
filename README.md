@@ -79,6 +79,24 @@ via [ActiveModelSerializers](https://github.com/rails-api/active_model_serialize
 
 #### Querying
 
+Queries are scoped to the results returned from the `resource_scope` method.  By default this returns all records, however, you can override it to further filter the results (i.e. based on query params, nested route params, etc.):
+
+```ruby
+class ExampleController < ApplicationController
+  include Terrain::Resource
+
+  resource Example, permit: [:foo, :bar, :baz]
+
+  private
+
+  def resource_scope
+    scope = super
+    scope = scope.where(foo: params[:foo]) if params[:foo].present?
+    scope
+  end
+end
+```
+
 Params:
 
 * `include` - This corresponds to the `ActiveModelSerializers` include option and embeds the given relationships in the response.  Relationships are also preloaded according to the given string.  If omitted then no relationships will be included or embedded in the response.

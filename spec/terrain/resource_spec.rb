@@ -17,7 +17,22 @@ describe 'Terrain::Resource', type: :controller do
 
     it 'responds with serialized records' do
       get :index
-      expect(response.body).to eq serialize(Example.all).to_json
+      expect(response.body).to eq serialize(examples).to_json
+    end
+
+    context 'filtered' do
+      controller do
+        resource Example
+
+        def resource_scope
+          super.where(foo: params[:foo])
+        end
+      end
+
+      it 'responds with filtered records' do
+        get :index, foo: examples.first.foo
+        expect(response.body).to eq serialize([examples.first]).to_json
+      end
     end
   end
 
