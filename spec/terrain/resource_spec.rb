@@ -31,6 +31,16 @@ describe 'Terrain::Resource', type: :controller do
         expect { post :create, params }.to raise_error ActiveRecord::RecordInvalid
       end
     end
+
+    context 'with failing policy' do
+      before do
+        allow_any_instance_of(Example).to receive(:policy_class) { policy_double(create?: false) }
+      end
+
+      it 'raises error' do
+        expect { post :create, params }.to raise_error Pundit::NotAuthorizedError
+      end
+    end
   end
 
   describe '#show' do
@@ -52,6 +62,16 @@ describe 'Terrain::Resource', type: :controller do
 
       it 'raises error' do
         expect { get :show, params }.to raise_error ActiveRecord::RecordNotFound
+      end
+    end
+
+    context 'with failing policy' do
+      before do
+        allow_any_instance_of(Example).to receive(:policy_class) { policy_double(show?: false) }
+      end
+
+      it 'raises error' do
+        expect { get :show, params }.to raise_error Pundit::NotAuthorizedError
       end
     end
   end
@@ -94,6 +114,16 @@ describe 'Terrain::Resource', type: :controller do
         expect { patch :update, params }.to raise_error ActiveRecord::RecordNotFound
       end
     end
+
+    context 'with failing policy' do
+      before do
+        allow_any_instance_of(Example).to receive(:policy_class) { policy_double(update?: false) }
+      end
+
+      it 'raises error' do
+        expect { patch :update, params }.to raise_error Pundit::NotAuthorizedError
+      end
+    end
   end
 
   describe '#destroy' do
@@ -114,6 +144,16 @@ describe 'Terrain::Resource', type: :controller do
 
       it 'raises error' do
         expect { patch :update, params }.to raise_error ActiveRecord::RecordNotFound
+      end
+    end
+
+    context 'with failing policy' do
+      before do
+        allow_any_instance_of(Example).to receive(:policy_class) { policy_double(destroy?: false) }
+      end
+
+      it 'raises error' do
+        expect { delete :destroy, params }.to raise_error Pundit::NotAuthorizedError
       end
     end
   end

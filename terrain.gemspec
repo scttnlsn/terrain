@@ -15,5 +15,6 @@ Gem::Specification.new do |gem|
   gem.require_paths = ['lib']
 
   gem.add_dependency 'activesupport'
+  gem.add_dependency 'pundit', '1.1.0'
   gem.add_runtime_dependency 'active_model_serializers', '>= 0.10.0.rc5'
 end

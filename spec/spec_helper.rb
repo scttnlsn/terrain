@@ -43,6 +43,14 @@ module Helpers
   def serialize(value, options = {})
     ActiveModelSerializers::SerializableResource.new(value, options).as_json.symbolize_keys
   end
+
+  def policy_double(methods)
+    Class.new(Struct.new(:user, :record)) do
+      methods.each do |name, value|
+        define_method(name) { value }
+      end
+    end
+  end
 end
 
 RSpec.configure do |config|

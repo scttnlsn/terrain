@@ -23,7 +23,7 @@ describe 'Terrain::Errors', type: :controller do
   context 'unauthorized' do
     controller do
       def index
-        raise Terrain::Errors::Unauthorized
+        raise Pundit::NotAuthorizedError
       end
     end
 
