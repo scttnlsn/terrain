@@ -5,6 +5,7 @@ module Terrain
     extend ActiveSupport::Concern
 
     included do
+      rescue_from 'ActiveRecord::AssociationNotFoundError', with: :association_not_found
       rescue_from Unauthenticated, with: :unauthenticated
       rescue_from 'Pundit::NotAuthorizedError', with: :unauthorized
       rescue_from 'ActiveRecord::RecordNotFound', with: :record_not_found
@@ -12,6 +13,10 @@ module Terrain
       rescue_from 'ActiveRecord::RecordInvalid', with: :record_invalid
 
       private
+
+      def association_not_found
+        error_response(:association_not_found, 400)
+      end
 
       def unauthenticated
         error_response(:unauthenticated, 401)

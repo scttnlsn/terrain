@@ -7,6 +7,19 @@ describe 'Terrain::Errors', type: :controller do
 
   before { get :index }
 
+  context 'association not found' do
+    controller do
+      def index
+        raise ActiveRecord::AssociationNotFoundError.new(nil, nil)
+      end
+    end
+
+    it { expect(response.status).to eq 400 }
+    it { expect_json_types(error: :object) }
+    it { expect_json_types('error.message', :string) }
+    it { expect_json('error.key', 'association_not_found') }
+  end
+
   context 'unauthenticated' do
     controller do
       def index

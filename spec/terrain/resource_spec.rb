@@ -74,6 +74,32 @@ describe 'Terrain::Resource', type: :controller do
         expect { get :show, params }.to raise_error Pundit::NotAuthorizedError
       end
     end
+
+    context 'with relations' do
+      let!(:widgets) { create_list(:widget, 3, example: record) }
+
+      it 'does not include relations in serialized record' do
+        get :show, params
+        expect(response.body).to eq serialize(record, include: []).to_json
+      end
+
+      context 'with valid include' do
+        let(:params) { ActionController::Parameters.new(id: record.id, include: 'widgets') }
+
+        it 'includes relations in serialized record' do
+          get :show, params
+          expect(response.body).to eq serialize(record, include: ['widgets']).to_json
+        end
+      end
+
+      context 'with invalid include' do
+        let(:params) { ActionController::Parameters.new(id: record.id, include: 'widgets,wrong') }
+
+        it 'raises error' do
+          expect { get :show, params }.to raise_error ActiveRecord::AssociationNotFoundError
+        end
+      end
+    end
   end
 
   describe '#update' do

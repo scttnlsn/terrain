@@ -41,6 +41,7 @@ Terrain::Application.initialize!
 
 module Helpers
   def serialize(value, options = {})
+    options[:include] ||= []
     ActiveModelSerializers::SerializableResource.new(value, options).as_json.symbolize_keys
   end
 

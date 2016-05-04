@@ -21,21 +21,21 @@ module Terrain
         record = resource.new(permitted_params)
         authorize_record(record)
 
-        render json: create_record, status: 201
+        render json: create_record, include: [], status: 201
       end
 
       def show
         record = load_record
         authorize_record(record)
 
-        render json: record
+        render json: record, include: params[:include] || []
       end
 
       def update
         record = load_record
         authorize_record(record)
 
-        render json: update_record(record)
+        render json: update_record(record), include: []
       end
 
       def destroy
@@ -50,6 +50,18 @@ module Terrain
 
       def resource
         self.class.instance_variable_get('@resource')
+      end
+
+      def includes_hash
+        if params[:include].present?
+          ActiveModel::Serializer::IncludeTree::Parsing.include_string_to_hash(params[:include])
+        else
+          {}
+        end
+      end
+
+      def preloaded_resource
+        resource.includes(includes_hash)
       end
 
       def permitted_params
@@ -75,7 +87,7 @@ module Terrain
       # if additional functionality is needed.
 
       def load_record
-        resource.find(params[:id])
+        preloaded_resource.find(params[:id])
       end
 
       def create_record
