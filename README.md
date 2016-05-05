@@ -12,6 +12,18 @@ gem 'terrain'
 
 ## Usage
 
+* [Error handling](#error-handling)
+* [Resources](#resources)
+  * [Authorization](#authorization)
+  * [Serialization](#serialization)
+  * [Querying](#querying)
+    * [Filtering](#filtering)
+    * [Ordering](#ordering)
+    * [Pagination](#pagination)
+    * [Relationships](#relationships)
+  * [CRUD operations](#crud-operations)
+* [Config](#config)
+
 ### Error handling
 
 ```ruby
@@ -79,6 +91,10 @@ via [ActiveModelSerializers](https://github.com/rails-api/active_model_serialize
 
 #### Querying
 
+Records of a given resource are queried by requesting the `index` action.
+
+##### Filtering
+
 Queries are scoped to the results returned from the `resource_scope` method.  By default this returns all records, however, you can override it to further filter the results (i.e. based on query params, nested route params, etc.):
 
 ```ruby
@@ -97,13 +113,53 @@ class ExampleController < ApplicationController
 end
 ```
 
-Params:
+##### Ordering
 
-* `include` - This corresponds to the `ActiveModelSerializers` include option and embeds the given relationships in the response.  Relationships are also preloaded according to the given string.  If omitted then no relationships will be included or embedded in the response.
+You can pass an `order` param to reorder the response records.  Specify a comma-separated list of fields and prefix the field with a `-` for descending order:
+
+```ruby
+# corresponds to Example.order('foo', 'bar desc')
+get :index, order: 'foo,-bar'
+```
+
+##### Pagination
+
+To request a range of records, specify the range in an HTTP header:
+
+```ruby
+# Request the first 10 records
+get :index, {}, { 'Range' => '0-9' }
+```
+
+All responses include a `Content-Range` header that specifies the exact range returned as well as a total count of records.  i.e.
+
+```
+Content-Range: 0-9/100
+```
+
+You can also pass open ended ranges such as `10-` (i.e. skip the first 10 records).
+
+##### Relationships
+
+No model relationships are serialized in the response by default.  To specify the set of relationships to be embedded in the response, pass a comma-separated list of relationships in the `include` param.
+
+As an example, suppose we're querying for posts which each have many tags and belong to an author.  We could embed those relationships with the following `include` param:
+
+```ruby
+get :index, include: 'author,tags'
+```
+
+Suppose now that the author also has a profile relationship.  We could include the author, author profile and tags by passing:
+
+```ruby
+get :index, include: 'author.profile,tags'
+```
+
+Included relationships are automatically preloaded via the ActiveRecord `includes` method.  The `include` param is also supported in `show` actions.
 
 #### CRUD operations
 
-You may need an action to perform additional steps beyond simple persistence.  There are hooks for each CRUD operation (shown below with their default implementation):
+You may need an action to perform additional steps beyond simple persistence.  There are methods for performing CRUD operations that can be overridden (shown below with their default implementation):
 
 ```ruby
 class ExampleController < ApplicationController
@@ -128,7 +184,7 @@ class ExampleController < ApplicationController
 end
 ```
 
-#### Config
+### Config
 
 ```ruby
 Terrain.configure do |config|
