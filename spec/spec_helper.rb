@@ -43,7 +43,7 @@ module Helpers
   def serialize(value, options = {})
     options[:include] ||= []
     if value.respond_to?(:each)
-      ActiveModel::Serializer::CollectionSerializer.new(value, options).as_json
+      value.map { |item| serialize(item, options) }
     else
       ActiveModelSerializers::SerializableResource.new(value, options).as_json.symbolize_keys
     end

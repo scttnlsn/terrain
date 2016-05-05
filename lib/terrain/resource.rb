@@ -1,6 +1,8 @@
 require 'active_model_serializers'
 require 'pundit'
 
+require 'terrain/page'
+
 module Terrain
   module Resource
     extend ActiveSupport::Concern
@@ -19,7 +21,11 @@ module Terrain
 
     module Actions
       def index
-        render json: resource_scope
+        range = request.headers['Range']
+        page = Terrain::Page.new(resource_scope, range)
+
+        headers['Content-Range'] = page.content_range
+        render json: page.records, include: (params[:include] || [])
       end
 
       def create

@@ -8,7 +8,7 @@ describe 'Terrain::Resource', type: :controller do
   end
 
   describe '#index' do
-    let!(:examples) { create_list(:example, 10) }
+    let!(:records) { create_list(:example, 10) }
 
     it 'responds with 200 status' do
       get :index
@@ -17,7 +17,12 @@ describe 'Terrain::Resource', type: :controller do
 
     it 'responds with serialized records' do
       get :index
-      expect(response.body).to eq serialize(examples).to_json
+      expect(response.body).to eq serialize(records).to_json
+    end
+
+    it 'responds with Content-Range header' do
+      get :index
+      expect(response.headers['Content-Range']).to eq Terrain::Page.new(Example.all).content_range
     end
 
     context 'filtered' do
@@ -30,8 +35,52 @@ describe 'Terrain::Resource', type: :controller do
       end
 
       it 'responds with filtered records' do
-        get :index, foo: examples.first.foo
-        expect(response.body).to eq serialize([examples.first]).to_json
+        get :index, foo: records.first.foo
+        expect(response.body).to eq serialize([records.first]).to_json
+      end
+    end
+
+    context 'paged' do
+      before { request.headers['Range'] = '0-4' }
+
+      it 'responds with requested records' do
+        get :index
+        expect(response.body).to eq serialize(records[0..4]).to_json
+      end
+
+      it 'responds with Content-Range header' do
+        get :index
+        expect(response.headers['Content-Range']).to eq Terrain::Page.new(Example.all, '0-4').content_range
+      end
+    end
+
+    context 'with relations' do
+      before do
+        records.each do |record|
+          create_list(:widget, 3, example: record)
+        end
+      end
+
+      it 'does not include relations in serialized record' do
+        get :index
+        expect(response.body).to eq serialize(records, include: []).to_json
+      end
+
+      context 'with valid include' do
+        let(:params) { ActionController::Parameters.new(include: 'widgets') }
+
+        it 'includes relations in serialized record' do
+          get :index, params
+          expect(response.body).to eq serialize(records, include: ['widgets']).to_json
+        end
+      end
+
+      context 'with invalid include' do
+        let(:params) { ActionController::Parameters.new(include: 'widgets,wrong') }
+
+        it 'raises error' do
+          expect { get :index, params }.to raise_error ActiveRecord::AssociationNotFoundError
+        end
       end
     end
   end

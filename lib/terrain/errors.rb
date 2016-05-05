@@ -1,3 +1,5 @@
+require 'terrain/page'
+
 module Terrain
   module Errors
     extend ActiveSupport::Concern
@@ -9,7 +11,20 @@ module Terrain
       rescue_from 'ActionController::RoutingError', with: :route_not_found
       rescue_from 'ActiveRecord::RecordInvalid', with: :record_invalid
 
+      rescue_from Terrain::Page::RangeError, with: :range_error
+
       private
+
+      def error_response(key = :server_error, status = 500)
+        result = {
+          error: {
+            key: key,
+            message: I18n.t("terrain.errors.#{key}", request: request)
+          }
+        }
+
+        render json: result, status: status
+      end
 
       def association_not_found
         error_response(:association_not_found, 400)
@@ -35,15 +50,8 @@ module Terrain
         error_response(:record_invalid, 422)
       end
 
-      def error_response(key = :server_error, status = 500)
-        result = {
-          error: {
-            key: key,
-            message: I18n.t("terrain.errors.#{key}", request: request)
-          }
-        }
-
-        render json: result, status: status
+      def range_error
+        error_response(:range_error, 416)
       end
     end
   end

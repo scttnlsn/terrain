@@ -59,7 +59,20 @@ describe 'Terrain::Errors', type: :controller do
     it { expect_json('error.key', 'route_not_found') }
   end
 
-  context 'route not found' do
+  context 'range error' do
+    controller do
+      def index
+        raise Terrain::Page::RangeError
+      end
+    end
+
+    it { expect(response.status).to eq 416 }
+    it { expect_json_types(error: :object) }
+    it { expect_json_types('error.message', :string) }
+    it { expect_json('error.key', 'range_error') }
+  end
+
+  context 'record invalid' do
     controller do
       def index
         raise ActiveRecord::RecordInvalid, Example.new
