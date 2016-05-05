@@ -89,6 +89,6 @@ describe 'Terrain::Errors', type: :controller do
     it { expect_json_types(error: :object) }
     it { expect_json_types('error.message', :string) }
     it { expect_json('error.key', 'record_invalid') }
-    it { expect_json('error.details', record.errors.to_h) }
+    it { expect_json('error.details', record.errors.to_hash) }
   end
 end

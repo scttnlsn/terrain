@@ -51,7 +51,7 @@ module Terrain
       end
 
       def record_invalid(error)
-        error_response(:record_invalid, 422, error.record.errors.to_h)
+        error_response(:record_invalid, 422, error.record.errors.to_hash)
       end
 
       def range_error
