@@ -26,6 +26,13 @@ describe 'Terrain::Resource', type: :controller do
     end
 
     context 'filtered' do
+      let(:record) { records.first }
+
+      before do
+        record.foo = 'test'
+        record.save!
+      end
+
       controller do
         resource Example
 
@@ -35,8 +42,8 @@ describe 'Terrain::Resource', type: :controller do
       end
 
       it 'responds with filtered records' do
-        get :index, foo: records.first.foo
-        expect(response.body).to eq serialize([records.first]).to_json
+        get :index, foo: 'test'
+        expect(response.body).to eq serialize([record]).to_json
       end
     end
 
