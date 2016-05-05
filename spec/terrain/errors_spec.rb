@@ -73,15 +73,22 @@ describe 'Terrain::Errors', type: :controller do
   end
 
   context 'record invalid' do
+    let(:record) { Example.new }
+
     controller do
       def index
-        raise ActiveRecord::RecordInvalid, Example.new
+        record = Example.new
+        record.valid?
+        raise ActiveRecord::RecordInvalid, record
       end
     end
+
+    before { record.valid? }
 
     it { expect(response.status).to eq 422 }
     it { expect_json_types(error: :object) }
     it { expect_json_types('error.message', :string) }
     it { expect_json('error.key', 'record_invalid') }
+    it { expect_json('error.details', record.errors.to_h) }
   end
 end

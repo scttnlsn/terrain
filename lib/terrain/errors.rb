@@ -15,13 +15,17 @@ module Terrain
 
       private
 
-      def error_response(key = :server_error, status = 500)
+      def error_response(key = :server_error, status = 500, details = nil)
         result = {
           error: {
             key: key,
             message: I18n.t("terrain.errors.#{key}", request: request)
           }
         }
+
+        if details.present?
+          result[:error][:details] = details
+        end
 
         render json: result, status: status
       end
@@ -46,8 +50,8 @@ module Terrain
         error_response(:route_not_found, 404)
       end
 
-      def record_invalid
-        error_response(:record_invalid, 422)
+      def record_invalid(error)
+        error_response(:record_invalid, 422, error.record.errors.to_h)
       end
 
       def range_error

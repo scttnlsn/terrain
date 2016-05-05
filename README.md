@@ -46,7 +46,8 @@ JSON responses are of the form:
 {
   "error": {
     "key": "type_of_error",
-    "message": "Localized error message"
+    "message": "Localized error message",
+    "details": "Optional details"
   }
 }
 ```
@@ -62,7 +63,7 @@ class ExampleController < ApplicationController
   private
 
   def my_error
-    error_response(:type_of_error, 500)
+    error_response(:type_of_error, 500, { some: :details })
   end
 end
 ```
