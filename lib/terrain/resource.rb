@@ -21,8 +21,10 @@ module Terrain
 
     module Actions
       def index
+        scope = order(resource_scope)
+
         range = request.headers['Range']
-        page = Terrain::Page.new(resource_scope, range)
+        page = Terrain::Page.new(scope, range)
 
         headers['Content-Range'] = page.content_range
         render json: page.records, include: (params[:include] || [])
@@ -92,6 +94,25 @@ module Terrain
         if finder.policy
           authorize(record)
         end
+      end
+
+      def order(scope)
+        if params[:order].present?
+          order = params[:order].gsub(/ /, '').split(',').map do |field|
+            direction = 'asc'
+
+            if field[0] == '-'
+              direction = 'desc'
+              field = field[1..-1]
+            end
+
+            "#{field} #{direction}"
+          end
+
+          scope = scope.order(order)
+        end
+
+        scope
       end
 
       def resource_scope

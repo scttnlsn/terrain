@@ -40,6 +40,33 @@ describe 'Terrain::Resource', type: :controller do
       end
     end
 
+    context 'ordered' do
+      let(:params) { ActionController::Parameters.new(order: 'foo') }
+
+      it 'responds with ordered records' do
+        get :index, params
+        expect(response.body).to eq serialize(Example.order('foo asc')).to_json
+      end
+
+      context 'descending' do
+        let(:params) { ActionController::Parameters.new(order: '-foo') }
+
+        it 'responds with ordered records' do
+          get :index, params
+          expect(response.body).to eq serialize(Example.order('foo desc')).to_json
+        end
+      end
+
+      context 'multiple sort columns' do
+        let(:params) { ActionController::Parameters.new(order: ' - foo , bar  ') }
+
+        it 'responds with ordered records' do
+          get :index, params
+          expect(response.body).to eq serialize(Example.order('foo desc', 'bar asc')).to_json
+        end
+      end
+    end
+
     context 'paged' do
       before { request.headers['Range'] = '0-4' }
 
