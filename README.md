@@ -127,3 +127,12 @@ class ExampleController < ApplicationController
   end
 end
 ```
+
+#### Config
+
+```ruby
+Terrain.configure do |config|
+  # Maximum number of records returned
+  config.max_records = Float::INFINITY
+end
+```

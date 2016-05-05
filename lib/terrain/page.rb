@@ -32,7 +32,8 @@ module Terrain
 
     def records
       from, to = bounds
-      @records ||= scope.offset(from).limit(to - from + 1)
+      limit = [to - from + 1, Terrain.config.max_records].min
+      @records ||= scope.offset(from).limit(limit)
     end
 
     def content_range

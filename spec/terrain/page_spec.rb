@@ -63,7 +63,14 @@ describe Terrain::Page do
     context 'with fewer records than requested range' do
       let(:range) { '5-14' }
 
-      it { is_expected.to eq records[5..-1] }
+      it { is_expected.to eq records[5..9] }
+    end
+
+    context 'with max records configured' do
+      before { Terrain.config.max_records = 3 }
+      after { Terrain.config.max_records = nil }
+
+      it { is_expected.to eq records[0..2] }
     end
   end
 
@@ -76,6 +83,13 @@ describe Terrain::Page do
       let(:range) { '5-14' }
 
       it { is_expected.to eq '5-9/10' }
+    end
+
+    context 'with max records configured' do
+      before { Terrain.config.max_records = 3 }
+      after { Terrain.config.max_records = nil }
+
+      it { is_expected.to eq '0-2/10' }
     end
 
     context 'with no records' do
