@@ -1,5 +1,7 @@
 # Terrain
 
+[![Build Status](https://travis-ci.org/scttnlsn/terrain.png?branch=master)](https://travis-ci.org/scttnlsn/terrain)
+
 Opinionated toolkit for building CRUD APIs with Rails
 
 ## Install
