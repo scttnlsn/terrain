@@ -72,6 +72,18 @@ describe 'Terrain::Resource', type: :controller do
           expect(response.body).to eq serialize(Example.order('foo desc', 'bar asc')).to_json
         end
       end
+
+      context 'with restricted policy' do
+        before do
+          allow(Example).to receive(:policy_class) { BlankPolicy }
+          allow_any_instance_of(BlankPolicy::Scope).to receive(:resolve) { Example.where('1 = 0') }
+        end
+
+        it 'returns policy scoped results' do
+          get :index
+          expect(response.body).to eq serialize([]).to_json
+        end
+      end
     end
 
     context 'paged' do

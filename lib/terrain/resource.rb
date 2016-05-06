@@ -89,11 +89,13 @@ module Terrain
         end
       end
 
+      def pundit_policy?(object)
+        finder = Pundit::PolicyFinder.new(object)
+        finder.policy.present?
+      end
+
       def authorize_record(record)
-        finder = Pundit::PolicyFinder.new(record)
-        if finder.policy
-          authorize(record)
-        end
+        authorize(record) if pundit_policy?(record)
       end
 
       def order(scope)
@@ -116,7 +118,9 @@ module Terrain
       end
 
       def resource_scope
-        preloaded_resource.all
+        scope = preloaded_resource.all
+        scope = policy_scope(scope) if pundit_policy?(scope)
+        scope
       end
 
       def load_record
